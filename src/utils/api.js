@@ -10,13 +10,33 @@ const api = axios.create({
 });
 
 // --------------------------------------------------
-// 🔐 Request Interceptor → Token Auto Add
+// 🔐 Request Interceptor → Token Auto Add (IMPROVED)
 // --------------------------------------------------
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('authToken');
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      // Token validity check karo
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const isExpired = payload.exp * 1000 < Date.now();
+        
+        if (isExpired) {
+          console.log('❌ Token expired, logging out...');
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('userName');
+          window.location.href = '/login';
+          return Promise.reject(new Error('Token expired'));
+        }
+        
+        config.headers.Authorization = `Bearer ${token}`;
+      } catch (error) {
+        console.error('❌ Invalid token:', error);
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userName');
+        window.location.href = '/login';
+        return Promise.reject(new Error('Invalid token'));
+      }
     }
     return config;
   },
@@ -24,15 +44,22 @@ api.interceptors.request.use(
 );
 
 // --------------------------------------------------
-// ❗ Response Interceptor → Auto Logout When Token Expired
+// ❗ Response Interceptor → Auto Logout When Token Expired (IMPROVED)
 // --------------------------------------------------
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    console.log('❌ API Error:', error.response?.status);
+    
     if (error.response?.status === 401) {
+      console.log('🔐 Unauthorized, clearing tokens...');
       localStorage.removeItem('authToken');
       localStorage.removeItem('userName');
-      window.location.href = '/login';
+      
+      // Current page check karo - agar profile page hai to redirect karo
+      if (window.location.pathname === '/profile') {
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
@@ -57,6 +84,13 @@ export const authAPI = {
   googleAuth: (googleData) => api.post('/auth/google', googleData),
 
   getProfile: () => api.get('/auth/user'),
+  // Forgot Password
+  forgotPassword: (email) => 
+    api.post('/auth/forgot-password', { email }),
+
+  resetPassword: (token, newPassword) => 
+    api.post('/auth/reset-password', { token, newPassword }),
+
 };
 
 // --------------------------------------------------
@@ -134,6 +168,44 @@ export const meditationAPI = {
 // --------------------------------------------------
 export const progressAPI = {
   getStats: () => api.get('/progress'),
+};
+
+// --------------------------------------------------
+// ⚙️ SETTINGS APIs
+// --------------------------------------------------
+export const settingsAPI = {
+  // Get user settings
+  getSettings: () => api.get('/settings'),
+  
+  // Update user settings
+  updateSettings: (settingsData) => api.put('/settings', settingsData),
+  
+  // Export data
+  exportData: () => api.get('/settings/export-data'),
+  
+  // Delete account
+  deleteAccount: (confirmation) => api.delete('/settings/delete-account', { data: { confirmation } })
+};
+
+// --------------------------------------------------
+// 👤 PROFILE APIs
+// --------------------------------------------------
+export const profileAPI = {
+  // Get user profile
+  getProfile: () => api.get('/profile'),
+  
+  // Update profile (name)
+  updateProfile: (profileData) => api.put('/profile', profileData),
+  
+  // Upload avatar
+  uploadAvatar: (formData) => api.post('/profile/upload-avatar', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  }),
+  
+  // Remove avatar
+  removeAvatar: () => api.delete('/profile/remove-avatar')
 };
 
 export default api;

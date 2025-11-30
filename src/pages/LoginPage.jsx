@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { authAPI } from "../utils/api";
 
 export default function LoginPage({ onLogin }) {
@@ -116,7 +116,6 @@ export default function LoginPage({ onLogin }) {
         <p className="text-center mb-lg">
           {isSignup ? "Create your account" : "Sign in to your account"}
         </p>
-
         {error && (
           <div
             className="mental-card error-message"
@@ -130,7 +129,6 @@ export default function LoginPage({ onLogin }) {
             {error}
           </div>
         )}
-
         {/* Email Login/Signup Form */}
         <form
           onSubmit={handleEmailAuth}
@@ -211,7 +209,24 @@ export default function LoginPage({ onLogin }) {
               : "Sign In"}
           </button>
         </form>
+        {/* ------------ // Add this in your LoginPage component after the form: */}
 
+        <div className="text-center mt-md">
+          <Link
+            to="/forgot-password"
+            className="mental-btn mental-btn-link"
+            style={{
+              color: "var(--primary-color)",
+              textDecoration: "underline",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              fontSize: "0.9rem",
+            }}
+          >
+            Forgot your password?
+          </Link>
+        </div>
         {/* Switch between Login/Signup */}
         <div className="text-center mt-md">
           <button
@@ -234,7 +249,6 @@ export default function LoginPage({ onLogin }) {
               : "Don't have an account? Sign up"}
           </button>
         </div>
-
         {/* Google OAuth Section */}
         <div
           className="mt-md"

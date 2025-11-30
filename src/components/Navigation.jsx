@@ -14,6 +14,7 @@ import {
   LogOut,
   User,
   Menu,
+  Settings,
   X,
 } from "lucide-react";
 
@@ -212,6 +213,9 @@ function DesktopNavLinks({ onLogout, onThemeToggle, theme }) {
     { path: "/breathing", label: "Breathe", icon: Wind },
     { path: "/progress", label: "Progress", icon: TrendingUp },
     { path: "/community", label: "Community", icon: Users },
+    // ✅ NEW LINKS ADD KARO
+    { path: "/profile", label: "Profile", icon: User },
+    { path: "/settings", label: "Settings", icon: Settings },
   ];
 
   return (
@@ -261,6 +265,9 @@ function MobileNavLinks({ onLogout, onThemeToggle, theme, onLinkClick }) {
     { path: "/breathing", label: "Breathing", icon: Wind },
     { path: "/progress", label: "Progress", icon: TrendingUp },
     { path: "/community", label: "Community", icon: Users },
+    // ✅ NEW LINKS ADD KARO
+    { path: "/profile", label: "Profile", icon: User },
+    { path: "/settings", label: "Settings", icon: Settings },
   ];
 
   const handleLinkClick = () => {
