@@ -225,7 +225,7 @@ function DesktopNavLinks({ onLogout, onThemeToggle, theme }) {
         return (
           <Link key={item.path} to={item.path} className="nav-link-desktop">
             <IconComponent className="nav-icon" size={18} />
-            <span className="nav-label">{item.label}</span>
+            
           </Link>
         );
       })}
